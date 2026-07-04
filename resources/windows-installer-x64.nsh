@@ -3,80 +3,80 @@
 
 !include "x64.nsh"
 
-!ifndef AIONUI_APP_PROCESS_CHECK_DEFINED
-!define AIONUI_APP_PROCESS_CHECK_DEFINED
-!define AIONUI_APP_EXECUTABLE_FILENAME "AionUi.exe"
-!define AIONUI_PROCESS_CHECK_LOG "aionui-installer-process-check.log"
+!ifndef CARBONFUSION_APP_PROCESS_CHECK_DEFINED
+!define CARBONFUSION_APP_PROCESS_CHECK_DEFINED
+!define CARBONFUSION_APP_EXECUTABLE_FILENAME "CarbonFusion.exe"
+!define CARBONFUSION_PROCESS_CHECK_LOG "carbonfusion-installer-process-check.log"
 
 !ifndef BUILD_UNINSTALLER
-  Var /GLOBAL AionUiUninstallHadErrors
-  Var /GLOBAL AionUiUninstallLogResult
+  Var /GLOBAL CarbonFusionUninstallHadErrors
+  Var /GLOBAL CarbonFusionUninstallLogResult
 !endif
 
-!macro AIONUI_LOG_UNINSTALLER_REPAIR _PHASE
+!macro CARBONFUSION_LOG_UNINSTALLER_REPAIR _PHASE
   nsExec::Exec `"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -Command "& { \
     $$ErrorActionPreference = 'SilentlyContinue'; \
-    $$log = Join-Path $$env:TEMP '${AIONUI_PROCESS_CHECK_LOG}'; \
+    $$log = Join-Path $$env:TEMP '${CARBONFUSION_PROCESS_CHECK_LOG}'; \
     $$path = '$INSTDIR\${UNINSTALL_FILENAME}'; \
     $$item = Get-Item -LiteralPath $$path -ErrorAction SilentlyContinue; \
     $$version = if ($$item) { $$item.VersionInfo.ProductVersion } else { '' }; \
     $$length = if ($$item) { $$item.Length } else { '' }; \
     Add-Content -LiteralPath $$log -Encoding UTF8 -Value ('[' + (Get-Date -Format o) + '] uninstaller-repair phase=${_PHASE} instDir=$INSTDIR path=' + $$path + ' exists=' + [bool]$$item + ' version=' + $$version + ' length=' + $$length) \
   }"`
-  Pop $AionUiRepairLogResult
+  Pop $CarbonFusionRepairLogResult
 !macroend
 
-!macro AIONUI_REPAIR_INSTALLED_UNINSTALLER
-  Var /GLOBAL AionUiInstalledUninstaller
-  Var /GLOBAL AionUiBundledUninstaller
-  Var /GLOBAL AionUiRepairLogResult
+!macro CARBONFUSION_REPAIR_INSTALLED_UNINSTALLER
+  Var /GLOBAL CarbonFusionInstalledUninstaller
+  Var /GLOBAL CarbonFusionBundledUninstaller
+  Var /GLOBAL CarbonFusionRepairLogResult
 
-  !insertmacro AIONUI_LOG_UNINSTALLER_REPAIR "before"
-  StrCpy $AionUiInstalledUninstaller "$INSTDIR\${UNINSTALL_FILENAME}"
+  !insertmacro CARBONFUSION_LOG_UNINSTALLER_REPAIR "before"
+  StrCpy $CarbonFusionInstalledUninstaller "$INSTDIR\${UNINSTALL_FILENAME}"
 
-  ${If} ${FileExists} "$AionUiInstalledUninstaller"
+  ${If} ${FileExists} "$CarbonFusionInstalledUninstaller"
     InitPluginsDir
-    StrCpy $AionUiBundledUninstaller "$PLUGINSDIR\AionUi-fixed-uninstaller.exe"
+    StrCpy $CarbonFusionBundledUninstaller "$PLUGINSDIR\CarbonFusion-fixed-uninstaller.exe"
     SetOverwrite on
-    File "/oname=$PLUGINSDIR\AionUi-fixed-uninstaller.exe" "${UNINSTALLER_OUT_FILE}"
+    File "/oname=$PLUGINSDIR\CarbonFusion-fixed-uninstaller.exe" "${UNINSTALLER_OUT_FILE}"
 
     ClearErrors
-    CopyFiles /SILENT "$AionUiBundledUninstaller" "$AionUiInstalledUninstaller"
+    CopyFiles /SILENT "$CarbonFusionBundledUninstaller" "$CarbonFusionInstalledUninstaller"
     ${If} ${Errors}
-      !insertmacro AIONUI_LOG_UNINSTALLER_REPAIR "copy-failed"
+      !insertmacro CARBONFUSION_LOG_UNINSTALLER_REPAIR "copy-failed"
     ${Else}
-      !insertmacro AIONUI_LOG_UNINSTALLER_REPAIR "after-copy"
+      !insertmacro CARBONFUSION_LOG_UNINSTALLER_REPAIR "after-copy"
     ${EndIf}
   ${Else}
-    !insertmacro AIONUI_LOG_UNINSTALLER_REPAIR "missing"
+    !insertmacro CARBONFUSION_LOG_UNINSTALLER_REPAIR "missing"
   ${EndIf}
 !macroend
 
-!macro AIONUI_LOG_UNINSTALL_RESULT _ROOT_KEY _HAD_ERRORS
+!macro CARBONFUSION_LOG_UNINSTALL_RESULT _ROOT_KEY _HAD_ERRORS
   nsExec::Exec `"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -Command "& { \
     $$ErrorActionPreference = 'SilentlyContinue'; \
-    $$log = Join-Path $$env:TEMP '${AIONUI_PROCESS_CHECK_LOG}'; \
+    $$log = Join-Path $$env:TEMP '${CARBONFUSION_PROCESS_CHECK_LOG}'; \
     Add-Content -LiteralPath $$log -Encoding UTF8 -Value ('[' + (Get-Date -Format o) + '] uninstall-result root=${_ROOT_KEY} launchErrors=${_HAD_ERRORS} exitCode=$R0 instDir=$INSTDIR') \
   }"`
-  Pop $AionUiUninstallLogResult
+  Pop $CarbonFusionUninstallLogResult
 !macroend
 
-!macro AIONUI_LOG_EVENT _MESSAGE
+!macro CARBONFUSION_LOG_EVENT _MESSAGE
   Push $9
   nsExec::Exec `"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -Command "& { \
     $$ErrorActionPreference = 'SilentlyContinue'; \
-    $$log = Join-Path $$env:TEMP '${AIONUI_PROCESS_CHECK_LOG}'; \
+    $$log = Join-Path $$env:TEMP '${CARBONFUSION_PROCESS_CHECK_LOG}'; \
     Add-Content -LiteralPath $$log -Encoding UTF8 -Value ('[' + (Get-Date -Format o) + '] ${_MESSAGE}') \
   }"`
   Pop $9
   Pop $9
 !macroend
 
-!macro AIONUI_LOG_ATOMIC_REMOVE_FAILURE
+!macro CARBONFUSION_LOG_ATOMIC_REMOVE_FAILURE
   Push $9
   nsExec::Exec `"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -Command "& { \
     $$ErrorActionPreference = 'SilentlyContinue'; \
-    $$log = Join-Path $$env:TEMP '${AIONUI_PROCESS_CHECK_LOG}'; \
+    $$log = Join-Path $$env:TEMP '${CARBONFUSION_PROCESS_CHECK_LOG}'; \
     $$failed = '$R0'; \
     $$instDir = '$INSTDIR'; \
     $$oldInstallDir = '$PLUGINSDIR\old-install'; \
@@ -90,12 +90,12 @@
   Pop $9
 !macroend
 
-!macro AIONUI_FIND_APP_PROCESS _RETURN
+!macro CARBONFUSION_FIND_APP_PROCESS _RETURN
   nsExec::Exec `"$PowerShellPath" -NoProfile -ExecutionPolicy Bypass -Command "& { \
     $$ErrorActionPreference = 'SilentlyContinue'; \
-    $$log = Join-Path $$env:TEMP '${AIONUI_PROCESS_CHECK_LOG}'; \
+    $$log = Join-Path $$env:TEMP '${CARBONFUSION_PROCESS_CHECK_LOG}'; \
     $$instDir = '$INSTDIR'; \
-    $$target = [System.IO.Path]::GetFullPath((Join-Path $$instDir '${AIONUI_APP_EXECUTABLE_FILENAME}')); \
+    $$target = [System.IO.Path]::GetFullPath((Join-Path $$instDir '${CARBONFUSION_APP_EXECUTABLE_FILENAME}')); \
     $$psProc = @(Get-CimInstance -ClassName Win32_Process | Where-Object { $$_.ProcessId -eq $$PID })[0]; \
     $$installerPid = $$psProc.ParentProcessId; \
     $$hits = @(Get-CimInstance -ClassName Win32_Process | Where-Object { \
@@ -103,7 +103,7 @@
       $$cmd = $$_.CommandLine; \
       if (-not $$path) { $$path = $$_.Path } \
       $$_.ProcessId -ne $$installerPid -and \
-      $$_.Name -ieq '${AIONUI_APP_EXECUTABLE_FILENAME}' -and \
+      $$_.Name -ieq '${CARBONFUSION_APP_EXECUTABLE_FILENAME}' -and \
       $$path -and \
       $$cmd -notmatch '--type=' -and \
       [string]::Equals([System.IO.Path]::GetFullPath($$path), $$target, [System.StringComparison]::CurrentCultureIgnoreCase) \
@@ -115,12 +115,12 @@
   Pop ${_RETURN}
 !macroend
 
-!macro AIONUI_STOP_APP_PROCESSES
+!macro CARBONFUSION_STOP_APP_PROCESSES
   nsExec::Exec `"$PowerShellPath" -NoProfile -ExecutionPolicy Bypass -Command "& { \
     $$ErrorActionPreference = 'SilentlyContinue'; \
-    $$log = Join-Path $$env:TEMP '${AIONUI_PROCESS_CHECK_LOG}'; \
+    $$log = Join-Path $$env:TEMP '${CARBONFUSION_PROCESS_CHECK_LOG}'; \
     $$instDir = '$INSTDIR'; \
-    $$target = [System.IO.Path]::GetFullPath((Join-Path $$instDir '${AIONUI_APP_EXECUTABLE_FILENAME}')); \
+    $$target = [System.IO.Path]::GetFullPath((Join-Path $$instDir '${CARBONFUSION_APP_EXECUTABLE_FILENAME}')); \
     $$psProc = @(Get-CimInstance -ClassName Win32_Process | Where-Object { $$_.ProcessId -eq $$PID })[0]; \
     $$installerPid = $$psProc.ParentProcessId; \
     $$all = @(Get-CimInstance -ClassName Win32_Process); \
@@ -129,7 +129,7 @@
       $$cmd = $$_.CommandLine; \
       if (-not $$path) { $$path = $$_.Path } \
       $$_.ProcessId -ne $$installerPid -and \
-      $$_.Name -ieq '${AIONUI_APP_EXECUTABLE_FILENAME}' -and \
+      $$_.Name -ieq '${CARBONFUSION_APP_EXECUTABLE_FILENAME}' -and \
       $$path -and \
       $$cmd -notmatch '--type=' -and \
       [string]::Equals([System.IO.Path]::GetFullPath($$path), $$target, [System.StringComparison]::CurrentCultureIgnoreCase) \
@@ -146,34 +146,34 @@
     foreach ($$id in ($$ids | Sort-Object -Descending)) { Stop-Process -Id $$id -Force -ErrorAction SilentlyContinue } \
     exit 0 \
   }"`
-  Pop $AionUiStopResult
+  Pop $CarbonFusionStopResult
 !macroend
 
 !macro customCheckAppRunning
-  Var /GLOBAL AionUiCheckResult
-  Var /GLOBAL AionUiCloseRetries
-  Var /GLOBAL AionUiStopResult
+  Var /GLOBAL CarbonFusionCheckResult
+  Var /GLOBAL CarbonFusionCloseRetries
+  Var /GLOBAL CarbonFusionStopResult
 
-  !insertmacro AIONUI_FIND_APP_PROCESS $AionUiCheckResult
-  ${If} $AionUiCheckResult == 0
+  !insertmacro CARBONFUSION_FIND_APP_PROCESS $CarbonFusionCheckResult
+  ${If} $CarbonFusionCheckResult == 0
     MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "$(appRunning)" /SD IDOK IDOK aionui_do_stop_process
     Quit
 
     aionui_do_stop_process:
       DetailPrint "$(appClosing)"
-      !insertmacro AIONUI_STOP_APP_PROCESSES
-      StrCpy $AionUiCloseRetries 0
+      !insertmacro CARBONFUSION_STOP_APP_PROCESSES
+      StrCpy $CarbonFusionCloseRetries 0
 
     aionui_wait_for_close:
       Sleep 1000
-      !insertmacro AIONUI_FIND_APP_PROCESS $AionUiCheckResult
-      ${If} $AionUiCheckResult == 0
-        IntOp $AionUiCloseRetries $AionUiCloseRetries + 1
-        ${If} $AionUiCloseRetries > 10
+      !insertmacro CARBONFUSION_FIND_APP_PROCESS $CarbonFusionCheckResult
+      ${If} $CarbonFusionCheckResult == 0
+        IntOp $CarbonFusionCloseRetries $CarbonFusionCloseRetries + 1
+        ${If} $CarbonFusionCloseRetries > 10
           MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "$(appCannotBeClosed)" /SD IDCANCEL IDRETRY aionui_wait_for_close
           Quit
         ${Else}
-          !insertmacro AIONUI_STOP_APP_PROCESSES
+          !insertmacro CARBONFUSION_STOP_APP_PROCESSES
           Goto aionui_wait_for_close
         ${EndIf}
       ${EndIf}
@@ -181,19 +181,19 @@
 !macroend
 
 !macro customInit
-  !insertmacro AIONUI_REPAIR_INSTALLED_UNINSTALLER
+  !insertmacro CARBONFUSION_REPAIR_INSTALLED_UNINSTALLER
 !macroend
 
-!macro AIONUI_HANDLE_UNINSTALL_RESULT _ROOT_KEY
+!macro CARBONFUSION_HANDLE_UNINSTALL_RESULT _ROOT_KEY
   ${If} ${Errors}
-    StrCpy $AionUiUninstallHadErrors "1"
+    StrCpy $CarbonFusionUninstallHadErrors "1"
   ${Else}
-    StrCpy $AionUiUninstallHadErrors "0"
+    StrCpy $CarbonFusionUninstallHadErrors "0"
   ${EndIf}
 
-  !insertmacro AIONUI_LOG_UNINSTALL_RESULT "${_ROOT_KEY}" "$AionUiUninstallHadErrors"
+  !insertmacro CARBONFUSION_LOG_UNINSTALL_RESULT "${_ROOT_KEY}" "$CarbonFusionUninstallHadErrors"
 
-  ${If} $AionUiUninstallHadErrors == "1"
+  ${If} $CarbonFusionUninstallHadErrors == "1"
     DetailPrint `Uninstall was not successful. Not able to launch uninstaller!`
     Return
   ${EndIf}
@@ -207,23 +207,23 @@
 !macroend
 
 !macro customUnInstallCheck
-  !insertmacro AIONUI_HANDLE_UNINSTALL_RESULT "SHELL_CONTEXT"
+  !insertmacro CARBONFUSION_HANDLE_UNINSTALL_RESULT "SHELL_CONTEXT"
 !macroend
 
 !macro customUnInstallCheckCurrentUser
-  !insertmacro AIONUI_HANDLE_UNINSTALL_RESULT "HKEY_CURRENT_USER"
+  !insertmacro CARBONFUSION_HANDLE_UNINSTALL_RESULT "HKEY_CURRENT_USER"
 !macroend
 
 !macro customUnInit
-  !insertmacro AIONUI_LOG_EVENT "uninit instDir=$INSTDIR"
+  !insertmacro CARBONFUSION_LOG_EVENT "uninit instDir=$INSTDIR"
 !macroend
 
 !macro customUnInstall
-  !insertmacro AIONUI_LOG_EVENT "uninstall-section start instDir=$INSTDIR"
+  !insertmacro CARBONFUSION_LOG_EVENT "uninstall-section start instDir=$INSTDIR"
 !macroend
 
 !macro customRemoveFiles
-  !insertmacro AIONUI_LOG_EVENT "remove-start instDir=$INSTDIR"
+  !insertmacro CARBONFUSION_LOG_EVENT "remove-start instDir=$INSTDIR"
 
   ${if} ${isUpdated}
     CreateDirectory "$PLUGINSDIR\old-install"
@@ -231,16 +231,16 @@
     Push ""
     Call un.atomicRMDir
     Pop $R0
-    !insertmacro AIONUI_LOG_EVENT "remove-atomic result=$R0"
+    !insertmacro CARBONFUSION_LOG_EVENT "remove-atomic result=$R0"
 
     ${if} $R0 != 0
       DetailPrint "Atomic update cleanup failed; falling back to recursive removal: $R0"
-      !insertmacro AIONUI_LOG_ATOMIC_REMOVE_FAILURE
+      !insertmacro CARBONFUSION_LOG_ATOMIC_REMOVE_FAILURE
 
       Push ""
       Call un.restoreFiles
       Pop $R0
-      !insertmacro AIONUI_LOG_EVENT "remove-restore result=$R0"
+      !insertmacro CARBONFUSION_LOG_EVENT "remove-restore result=$R0"
     ${endif}
   ${endif}
 
@@ -248,10 +248,10 @@
   ClearErrors
   RMDir /r "$INSTDIR"
   ${if} ${Errors}
-    !insertmacro AIONUI_LOG_EVENT "remove-rmdir errors=1 instDir=$INSTDIR"
+    !insertmacro CARBONFUSION_LOG_EVENT "remove-rmdir errors=1 instDir=$INSTDIR"
     ClearErrors
   ${else}
-    !insertmacro AIONUI_LOG_EVENT "remove-rmdir errors=0 instDir=$INSTDIR"
+    !insertmacro CARBONFUSION_LOG_EVENT "remove-rmdir errors=0 instDir=$INSTDIR"
   ${endif}
 !macroend
 !endif
@@ -264,9 +264,9 @@ Function .onVerifyInstDir
   ${IfNot} ${RunningX64}
     MessageBox MB_OK|MB_ICONSTOP \
       "Installation package architecture mismatch$\n$\n\
-      This AionUi installer is designed for x64 architecture.$\n$\n\
+      This CarbonFusion installer is designed for x64 architecture.$\n$\n\
       Your system is 32-bit architecture. Please download the appropriate version for your architecture.$\n$\n\
-      Download: https://github.com/iOfficeAI/AionUi/releases"
+      Download: https://github.com/iOfficeAI/CarbonFusion/releases"
     Quit
   ${EndIf}
 
@@ -274,9 +274,9 @@ Function .onVerifyInstDir
   ${If} ${IsNativeARM64}
     MessageBox MB_OK|MB_ICONSTOP \
       "Installation package architecture mismatch$\n$\n\
-      This AionUi installer is designed for x64 architecture.$\n$\n\
+      This CarbonFusion installer is designed for x64 architecture.$\n$\n\
       Your system is ARM64 architecture. Please download the ARM64 version.$\n$\n\
-      Download: https://github.com/iOfficeAI/AionUi/releases"
+      Download: https://github.com/iOfficeAI/CarbonFusion/releases"
     Quit
   ${EndIf}
 FunctionEnd

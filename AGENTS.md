@@ -142,3 +142,9 @@ Allowed types: `feat`, `fix`, `perf`, `refactor`, `docs`, `style`, `chore`, `tes
 | **bump-version** | Version bump workflow: update package.json, checks, branch, PR, tag release | Bumping version, `/bump-version`                                                           |
 
 > Skills are located in `.claude/skills/` and contain project conventions that apply to **all** agents and contributors.
+
+
+# 项目开发记录 规则：
+- 目录：项目开发记录/
+- 文件名：YYYY-MM-DD.md（当天日期，同一天多次追加到同一文件末尾）
+- 内容包括：做了什么、解决了什么问题、踩了什么坑、最终方案是什么

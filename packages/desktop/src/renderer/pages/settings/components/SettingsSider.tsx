@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Tooltip } from '@arco-design/web-react';
 import { getSiderTooltipProps } from '@/renderer/utils/ui/siderTooltip';
-
+// liaohui 这是设置的侧边栏显示，
 /** Builtin settings tab IDs in display order (must match router paths). */
 export const BUILTIN_TAB_IDS = [
   'agent',
@@ -31,7 +31,7 @@ export const BUILTIN_TAB_IDS = [
   'capabilities',
   'appearance',
   'webui',
-  'pet',
+  // pet — 已从侧边栏隐藏
   'system',
   'about',
 ] as const;

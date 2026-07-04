@@ -7,7 +7,7 @@
  */
 
 import { existsSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { resolve, join } from 'node:path';
 import { execSync } from 'node:child_process';
 
 const BINARY_NAME = 'aioncore';
@@ -85,6 +85,18 @@ export function resolveBinaryPath(): string {
   );
 }
 
+function resolveDevResourcesPath(): string | undefined {
+  // In development mode, process.resourcesPath may be undefined or point to
+  // a non-existent directory. Use __dirname (out/main/) to backtrack to
+  // project root → resources/
+  const candidate = resolve(__dirname, '../../resources');
+  if (existsSync(candidate)) return candidate;
+  // Fallback: try process.cwd() as a last resort
+  const cwdCandidate = join(process.cwd(), 'resources');
+  if (existsSync(cwdCandidate)) return cwdCandidate;
+  return undefined;
+}
+
 /**
  * Check bundled binary in resources directory.
  * Layout: bundled-aioncore/{platform}-{arch}/aioncore[.exe]
@@ -94,7 +106,7 @@ function bundledPath(
   binaryName: string,
   diagnostics: BackendBinaryResolveDiagnostics
 ): string | null {
-  const resourcesPath = (process as NodeJS.Process & { resourcesPath?: string }).resourcesPath;
+  const resourcesPath = resolveResourcesPath();
   if (!resourcesPath) return null;
   diagnostics.resourcesPath = resourcesPath;
 
@@ -109,6 +121,15 @@ function bundledPath(
 
   if (existsSync(candidate)) return candidate;
   return null;
+}
+
+/** Resolve resources directory: check bundled path first, then dev fallback. */
+function resolveResourcesPath(): string | undefined {
+  const rp = (process as NodeJS.Process & { resourcesPath?: string }).resourcesPath;
+  // process.resourcesPath may be set even in dev mode but point to a
+  // non-existent directory. Only use it if bundled-aioncore actually exists.
+  if (rp && existsSync(join(rp, 'bundled-aioncore'))) return rp;
+  return resolveDevResourcesPath();
 }
 
 /**

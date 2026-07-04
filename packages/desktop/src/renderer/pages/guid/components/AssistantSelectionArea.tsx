@@ -37,16 +37,16 @@ const AssistantSelectionArea: React.FC<AssistantSelectionAreaProps> = ({
     [assistants]
   );
   const visibleAssistants = useMemo(() => {
-    if (enabledAssistants.length <= 4 || !selectedId) {
-      return enabledAssistants.slice(0, 4);
+    if (enabledAssistants.length <= 5 || !selectedId) {
+      return enabledAssistants.slice(0, 5);
     }
 
     const selectedIndex = enabledAssistants.findIndex((assistant) => assistant.id === selectedId);
-    if (selectedIndex < 0 || selectedIndex < 4) {
-      return enabledAssistants.slice(0, 4);
+    if (selectedIndex < 0 || selectedIndex < 5) {
+      return enabledAssistants.slice(0, 5);
     }
 
-    return [...enabledAssistants.slice(0, 3), enabledAssistants[selectedIndex]];
+    return [...enabledAssistants.slice(0, 4), enabledAssistants[selectedIndex]];
   }, [enabledAssistants, selectedId]);
   const hasOverflow = enabledAssistants.length > visibleAssistants.length;
   const overflowAssistants = useMemo(() => {
@@ -122,36 +122,47 @@ const AssistantSelectionArea: React.FC<AssistantSelectionAreaProps> = ({
     </div>
   );
 
+
+  const overflowRowlist = (
+    <div
+      className=' rounded-bl-[24px] rounded-br-[24px] p-2'
+      style={{ background: 'var(--bg-base, #fff)' }}
+    >
+      <div className='mb-8px w-full'>
+        <Input
+          size='small'
+          value={search}
+          onChange={setSearch}
+          prefix={<Search theme='outline' size={14} />}
+          placeholder={t('team.create.searchPlaceholder', { defaultValue: 'Search assistants...' })}
+        />
+      </div>
+
+
+      <div className='flex max-h-260px flex-col gap-4px overflow-y-auto flex-wrap rounded-bl-[24px]'>
+        {filteredOverflowAssistants.map((assistant) => (
+          <div key={assistant.id}>{renderAssistantPill(assistant, `assistant-overflow-${assistant.id}`)}</div>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className='mt-18px mb-16px w-full'>
       <div className='flex w-full justify-center'>
+        {/*liaohui 这里修改首页ai 助手的界面*/}
         <div
-          className='inline-flex max-w-full items-center rounded-999px px-6px py-6px'
+          className='inline-flex w-full  items-center rounded-tl-[24px] rounded-tr-[24px] px-6px py-6px'
           style={{ background: 'var(--color-guid-agent-bar, var(--aou-2))' }}
         >
-          <div className='flex min-w-0 max-w-full items-center gap-6px'>
+          <div className='flex min-w-0 w-full items-center gap-6px justify-between  '>
             {visibleAssistants.map((assistant) => renderAssistantPill(assistant, `preset-pill-${assistant.id}`))}
-            {hasOverflow ? (
-              <Dropdown
-                trigger='click'
-                position='bl'
-                droplist={overflowDroplist}
-                popupVisible={moreVisible}
-                onVisibleChange={setMoreVisible}
-              >
-                <Button
-                  data-testid='assistant-more-btn'
-                  type='text'
-                  className='!ml-6px !inline-flex !h-34px !shrink-0 !items-center !gap-4px !rounded-999px !border-none !px-12px !py-8px !text-13px !text-t-secondary opacity-75 transition-opacity hover:opacity-100'
-                >
-                  <span>{t('common.more', { defaultValue: 'More' })}</span>
-                  <Down theme='outline' size={14} />
-                </Button>
-              </Dropdown>
-            ) : null}
           </div>
+
         </div>
+
       </div>
+      {overflowRowlist}
     </div>
   );
 };

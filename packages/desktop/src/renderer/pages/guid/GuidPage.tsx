@@ -442,12 +442,6 @@ const GuidPage: React.FC = () => {
             <p className='text-2xl font-semibold mb-0 text-0 text-center'>{t('conversation.welcome.title')}</p>
           </div>
 
-          <AssistantSelectionArea
-            selectedAssistantId={agentSelection.selectedAssistantId}
-            assistants={agentSelection.assistants}
-            localeKey={localeKey}
-            onSelectAssistant={handleSelectAssistant}
-          />
 
           <GuidInputCard
             input={guidInput.input}
@@ -470,6 +464,14 @@ const GuidPage: React.FC = () => {
             onSelectWorkspace={(dir) => guidInput.setDir(dir)}
             onClearWorkspace={() => guidInput.setDir('')}
           />
+          {/*liaohui  首页 切换 专家和输入框的位置*/}
+          <AssistantSelectionArea
+            selectedAssistantId={agentSelection.selectedAssistantId}
+            assistants={agentSelection.assistants}
+            localeKey={localeKey}
+            onSelectAssistant={handleSelectAssistant}
+          />
+
 
           {selectedAssistantPrompts.length > 0 ? (
             <div className='mt-18px w-full animate-fade-in'>
