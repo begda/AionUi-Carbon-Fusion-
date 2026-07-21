@@ -104,7 +104,7 @@ jobs:
 
       - name: Prepare release assets
         shell: bash
-        run: bash scripts/prepare-release-assets-win.sh build-artifacts release-assets
+        run: bash scripts/prepare-release-assets.sh build-artifacts release-assets
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
